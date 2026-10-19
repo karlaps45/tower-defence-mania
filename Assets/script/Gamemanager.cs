@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum GamePhase
 {
@@ -40,7 +41,6 @@ public class GameManager : MonoBehaviour
         PlayerHealth = startingPlayerHealth;
         Coins = startingCoins;
 
-        // Keep the manager when changing scenes.
         DontDestroyOnLoad(gameObject);
     }
 
@@ -102,5 +102,14 @@ public class GameManager : MonoBehaviour
         Coins -= amount;
         ResourcesChanged?.Invoke(PlayerHealth, Coins);
         return true;
+    }
+
+
+    public void Update()
+    {
+        if (CurrentPhase == GamePhase.GameOver)
+        {
+            SceneManager.LoadScene("Samplescene");
+        }
     }
 }
