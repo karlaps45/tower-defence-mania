@@ -17,6 +17,15 @@ public class Enemy : MonoBehaviour
     [Header("Reward")]
     [SerializeField] private int coinReward = 5;
 
+    [Header("Item drop")]
+    [SerializeField, Range(0f, 1f)] private float itemDropChance = 0.05f;
+
+    [Header("Crit")]
+    [SerializeField] private float critChance = 5f;
+    [SerializeField] private float critDamage = 1.5f;
+
+    private StatusEffects status;
+
     private Transform[] waypoints;
     private int waypointIndex;
     private Tower closestTower;
@@ -146,7 +155,8 @@ public class Enemy : MonoBehaviour
             Quaternion.identity
         );
 
-        newBullet.Initialize(gameObject, BulletEffect.Damage, attackDamage);
+        newBullet.Initialize(gameObject, BulletConfig.Basic(
+      BulletEffect.Damage, DamageType.Physical, attackDamage, critChance, critDamage));
 
         Rigidbody2D bulletBody = newBullet.GetComponent<Rigidbody2D>();
         if (bulletBody != null)
@@ -170,6 +180,10 @@ public class Enemy : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.AddCoins(coinReward);
+        }
+        if (PlayerInventory.Instance != null && UnityEngine.Random.value < itemDropChance)
+        {
+            PlayerInventory.Instance.Add(ItemGenerator.GenerateRandom());
         }
     }
 }

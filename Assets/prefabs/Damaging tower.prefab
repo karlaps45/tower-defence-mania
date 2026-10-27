@@ -55,7 +55,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 20
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -213,6 +213,8 @@ GameObject:
   - component: {fileID: 5425435065274249890}
   - component: {fileID: 6085972297993355209}
   - component: {fileID: 8446800131144988752}
+  - component: {fileID: 6657632703251048137}
+  - component: {fileID: 6310139041498519594}
   m_Layer: 0
   m_Name: Damaging tower
   m_TagString: Player
@@ -379,12 +381,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e839def66eb1d0b4c84b31a44561d298, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
-  stats: {fileID: 11400000, guid: f290fe4e26873834187d8be1b1f3200b, type: 2}
+  stats: {fileID: 0}
   targetType: 0
   placementRadius: 0.5
   bulletPrefab: {fileID: 1364178807543045148, guid: 1c4f2b0adc5963d41a26e48109421076, type: 3}
   firePoint: {fileID: 0}
   bulletSpeed: 10
+  bulletModifiers:
+    size: 0
+    pierce: 0
+    poisonDps: 0
+    poisonDuration: 0
+    explodeMultiplier: 0
+    explodeRadius: 0
+    burnDps: 0
+    burnDuration: 0
+    slowPercent: 0
+    slowDuration: 0
 --- !u!114 &5425435065274249890
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -425,3 +438,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TowerHealthDisplay
   healthText: {fileID: 8037804634472735218}
   healthBar: {fileID: 0}
+--- !u!114 &6657632703251048137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9197684260638709283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c7c927689c3a4840aa36e402fb364e7, type: 3}
+  m_Name: basetowerstats
+  m_EditorClassIdentifier: Assembly-CSharp::TowerStats
+  cost: 10
+  physicalPower: 10
+  magicPower: 10
+  detectionRange: 5
+  maxHealth: 50
+  attackSpeed: 1
+  criticalChance: 2
+  criticalDamage: 2
+--- !u!114 &6310139041498519594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9197684260638709283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d11c66170010bf4bba4b0faf4b1a34a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilityController
+  startingAbilities: []

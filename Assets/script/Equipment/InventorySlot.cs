@@ -1,40 +1,43 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+
+public enum SlotTag { None, Head, Chest, Legs, Feet }
 
 public class InventorySlot : MonoBehaviour, IPointerClickHandler
 {
     public InventoryItem myItem { get; set; }
 
-    public Slottag myTag;
-
-
-    public void OnPointerclick(PointerEventData eventData)
+    public SlotTag myTag;
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="eventData"></param>
+    public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Left)
         {
             if (Inventory.carriedItem == null) return;
-            if (myTag != Slottag.None && Inventory.carriedItem.myItem.Itemtag != myTag) return;
-            setItem(InventoryItem.carriedItem);
+            if (myTag != SlotTag.None && Inventory.carriedItem.myItem.itemTag != myTag) return;
+            SetItem(Inventory.carriedItem);
         }
     }
 
-
-    public void setItem(InventoryItem item)
+    public void SetItem(InventoryItem item)
     {
-        Inventory.carriedITem = null;
+        Inventory.carriedItem = null;
 
+        // Reset old slot
         item.activeSlot.myItem = null;
 
+        // Set current slot
         myItem = item;
         myItem.activeSlot = this;
         myItem.transform.SetParent(transform);
-        myItem.canvasgroup.blocksRaycasts = true;
+        myItem.canvasGroup.blocksRaycasts = true;
 
-        if (myTag != Slottag.None)
-        {
-            Inventory.Singleton.EquipEquipment(myTag, myItem);
-        }
+        if (myTag != SlotTag.None)
+        { Inventory.Singleton.EquipEquipment(myTag, myItem); }
     }
-
-
 }

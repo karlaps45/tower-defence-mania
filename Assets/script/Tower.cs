@@ -8,6 +8,10 @@ public class Tower : MonoBehaviour
 
     public static IReadOnlyList<Tower> ActiveTowers => activeTowers;
 
+    public event System.Action<Transform, Vector2> ShotFired;
+    public bool TargetsEnemies => targetType == TowerTargetType.Enemies;
+    private AbilityController abilities;
+
     public enum TowerTargetType
     {
         Enemies,
@@ -23,7 +27,6 @@ public class Tower : MonoBehaviour
     [SerializeField] private Transform firePoint;
     [SerializeField] private float bulletSpeed = 10f;
 
-    private TowerStats runtimeStats;
     private CircleCollider2D detectionRadius;
     private readonly List<Transform> enemiesInRange = new List<Transform>();
     private readonly List<Health> alliesInRange = new List<Health>();
@@ -31,15 +34,32 @@ public class Tower : MonoBehaviour
     private float attackTimer;
 
     public Transform CurrentTarget => currentTarget;
-    public TowerStats RuntimeStats => runtimeStats;
+    public TowerStats RuntimeStats => stats;   // keeps other scripts compiling
     public float PlacementRadius => placementRadius;
-    public int Cost => stats != null ? stats.cost : 0;
+    public int Cost => stats != null ? stats.Cost : 0;
 
+    [Header("Bullet modifiers (testing for now, abilities will fill these later)")]
+    [SerializeField] private BulletModifiers bulletModifiers;
+
+    public event System.Action<Health, DamageInfo> BulletHit;
+
+    public void NotifyBulletHit(Health target, DamageInfo info)
+    {
+        BulletHit?.Invoke(target, info);
+    }
     public bool IsDetectionCollider(Collider2D otherCollider)
     {
         return otherCollider == detectionRadius;
     }
 
+    private void Awake()
+    {
+        if (stats == null) stats = GetComponent<TowerStats>();
+        abilities = GetComponent<AbilityController>();
+        if (abilities == null) abilities = gameObject.AddComponent<AbilityController>();
+        if (GetComponent<EquipmentSlots>() == null) gameObject.AddComponent<EquipmentSlots>();
+
+    }
     private void OnEnable()
     {
         if (!activeTowers.Contains(this))
@@ -55,27 +75,28 @@ public class Tower : MonoBehaviour
 
     private void Start()
     {
-        runtimeStats = Instantiate(stats);
-
-        Health health = GetComponent<Health>();
-        if (health != null)
-        {
-            health.SetMaximumHealth(runtimeStats.maxHealth);
-        }
-
         detectionRadius = GetComponent<CircleCollider2D>();
         detectionRadius.isTrigger = true;
-        detectionRadius.radius = runtimeStats.detectionRange;
+
+        ApplyStats(refillHealth: true);
+        stats.StatsChanged += OnStatsChanged;
     }
 
-    public void IncreaseMaximumHealth(float amount)
+    private void OnDestroy()
     {
-        runtimeStats.maxHealth += amount;
+        if (stats != null) stats.StatsChanged -= OnStatsChanged;
+    }
+
+    private void OnStatsChanged() => ApplyStats(refillHealth: false);
+
+    private void ApplyStats(bool refillHealth)
+    {
+        detectionRadius.radius = stats.DetectionRange;
 
         Health health = GetComponent<Health>();
         if (health != null)
         {
-            health.SetMaximumHealth(runtimeStats.maxHealth);
+            health.SetMaximumHealth(stats.MaxHealth, refillHealth);
         }
     }
 
@@ -135,37 +156,44 @@ public class Tower : MonoBehaviour
         Shoot(currentTarget);
 
         // AttackSpeed is treated as attacks per second.
-        attackTimer = 1f / Mathf.Max(0.01f, runtimeStats.AttackSpeed);
+        attackTimer = 1f / Mathf.Max(0.01f, stats.AttackSpeed);
+    }
+    public void FireBullet(BulletConfig config, Vector2 direction)
+    {
+        if (bulletPrefab == null)
+            return;
+
+        Transform shotOrigin = firePoint != null ? firePoint : transform;
+        Bullet newBullet = Instantiate(bulletPrefab, shotOrigin.position, Quaternion.identity);
+        newBullet.Initialize(gameObject, config);
+
+        Rigidbody2D body = newBullet.GetComponent<Rigidbody2D>();
+        if (body != null)
+        {
+            body.linearVelocity = direction.normalized * bulletSpeed;
+        }
     }
 
+    public BulletConfig BuildShotConfig()
+    {
+        BulletConfig config = targetType == TowerTargetType.Enemies
+            ? BulletConfig.Basic(BulletEffect.Damage, DamageType.Physical,
+                stats.PhysicalPower, stats.CriticalChance, stats.CriticalDamage)
+            : BulletConfig.Basic(BulletEffect.Heal, DamageType.Magic,
+                stats.MagicPower, 0f, 1f);
+
+        config.Modifiers = abilities != null
+            ? abilities.ModifyShot(bulletModifiers)
+            : bulletModifiers;
+        return config;
+    }
     private void Shoot(Transform target)
     {
         Transform shotOrigin = firePoint != null ? firePoint : transform;
-        Vector2 direction = (
-            target.position - shotOrigin.position
-        ).normalized;
+        Vector2 direction = (target.position - shotOrigin.position).normalized;
 
-        Bullet newBullet = Instantiate(
-            bulletPrefab,
-            shotOrigin.position,
-            Quaternion.identity
-        );
-
-        BulletEffect effect = targetType == TowerTargetType.Enemies
-            ? BulletEffect.Damage
-            : BulletEffect.Heal;
-
-        float amount = targetType == TowerTargetType.Enemies
-            ? runtimeStats.PhysicalPower
-            : runtimeStats.MagicPower;
-
-        newBullet.Initialize(gameObject, effect, amount);
-
-        Rigidbody2D bulletBody = newBullet.GetComponent<Rigidbody2D>();
-        if (bulletBody != null)
-        {
-            bulletBody.linearVelocity = direction * bulletSpeed;
-        }
+        FireBullet(BuildShotConfig(), direction);
+        ShotFired?.Invoke(target, direction);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
