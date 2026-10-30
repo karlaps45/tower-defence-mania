@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,6 +21,8 @@ public class GameManager : MonoBehaviour
 
     public event Action<GamePhase> PhaseChanged;
     public event Action<int, int> ResourcesChanged;
+
+    
 
     [Header("Player resources")]
     [SerializeField] private int startingPlayerHealth = 10;
@@ -107,9 +110,14 @@ public class GameManager : MonoBehaviour
 
     public void Update()
     {
+
+
         if (CurrentPhase == GamePhase.GameOver)
         {
             SceneManager.LoadScene("Samplescene");
         }
     }
+
+
+
 }

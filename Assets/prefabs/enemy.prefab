@@ -117,6 +117,9 @@ MonoBehaviour:
   bulletSpeed: 8
   targetRefreshInterval: 0.25
   coinReward: 100
+  itemDropChance: 0
+  critChance: 5
+  critDamage: 1.5
 --- !u!114 &2429747355835075917
 MonoBehaviour:
   m_ObjectHideFlags: 0

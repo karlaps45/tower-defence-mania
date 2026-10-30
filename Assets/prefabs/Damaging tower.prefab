@@ -381,7 +381,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e839def66eb1d0b4c84b31a44561d298, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
-  stats: {fileID: 0}
+  stats: {fileID: 6657632703251048137}
   targetType: 0
   placementRadius: 0.5
   bulletPrefab: {fileID: 1364178807543045148, guid: 1c4f2b0adc5963d41a26e48109421076, type: 3}
@@ -450,7 +450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c7c927689c3a4840aa36e402fb364e7, type: 3}
   m_Name: basetowerstats
   m_EditorClassIdentifier: Assembly-CSharp::TowerStats
-  cost: 10
+  cost: 100
   physicalPower: 10
   magicPower: 10
   detectionRange: 5
