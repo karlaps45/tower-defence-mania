@@ -5,7 +5,7 @@ Klas: sd2a
 
 Datum: 9/14/2026
 
-build is in 
+build is in https://github.com/karlaps45/tower-defence-mania/tree/main/maniaman
 
 
 ## 1. Titel en elevator pitch
