@@ -5,6 +5,9 @@ Klas: sd2a
 
 Datum: 9/14/2026
 
+build is in 
+
+
 ## 1. Titel en elevator pitch
 Titel: customazia
 
